@@ -176,10 +176,10 @@ void sceneInit(float width, float height)
     sScene.lightSpots[2] = { .position = { 0.3, 1.63,  1.43}, .direction = spotLight, .color = {1.0, 1.0, 1.0}, .constant = 1.0, .linear = 0.14, .quadratic = 0.07, .cutoff = to_radians(75.0f) };
     sScene.lightSpots[3] = { .position = {-0.3, 1.63,  1.43}, .direction = spotLight, .color = {1.0, 1.0, 1.0}, .constant = 1.0, .linear = 0.14, .quadratic = 0.07, .cutoff = to_radians(75.0f) };
 
-    sScene.shaderColor = shaderLoad("shader/default.vert", "shader/color.frag");
-    sScene.shaderWaterColor = shaderLoad("shader/water.vert", "shader/color.frag");
-    sScene.shaderWater = shaderLoad("shader/water.vert", "shader/blinn_phong.frag");
-    sScene.shaderBlinnPhong = shaderLoad("shader/default.vert", "shader/blinn_phong.frag");
+    sScene.shaderColor = shaderLoad("src/shader/default.vert", "src/shader/color.frag");
+    sScene.shaderWaterColor = shaderLoad("src/shader/water.vert", "src/shader/color.frag");
+    sScene.shaderWater = shaderLoad("src/shader/water.vert", "src/shader/blinn_phong.frag");
+    sScene.shaderBlinnPhong = shaderLoad("src/shader/default.vert", "src/shader/blinn_phong.frag");
 }
 
 void sceneUpdate(float dt)
@@ -236,10 +236,28 @@ void renderBlinnPhong()
         for(auto& material : model.material)
         {
             /* set material properties */
-            shaderUniform(sScene.shaderBlinnPhong, "uMaterial.ambient", material.ambient);
-            shaderUniform(sScene.shaderBlinnPhong, "uMaterial.diffuse", material.diffuse);
-            shaderUniform(sScene.shaderBlinnPhong, "uMaterial.specular", material.specular);
             shaderUniform(sScene.shaderBlinnPhong, "uMaterial.shininess", material.shininess);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, material.map_ambient.id);
+            shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_ambient", 0);
+
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, material.map_diffuse.id);
+            shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_diffuse", 1);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, material.map_specular.id);
+            shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_specular", 2);
+
+
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, material.map_normal.id);
+            shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_normal", 3);
+
+
+
+
 
             glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*) (material.indexOffset*sizeof(unsigned int)) );
         }
@@ -292,10 +310,24 @@ void renderBlinnPhong()
     for(auto& material : sScene.modelWater.material)
     {
         /* set material properties */
-        shaderUniform(sScene.shaderWater, "uMaterial.ambient", material.ambient);
-        shaderUniform(sScene.shaderWater, "uMaterial.diffuse", material.diffuse);
-        shaderUniform(sScene.shaderWater, "uMaterial.specular", material.specular);
-        shaderUniform(sScene.shaderWater, "uMaterial.shininess", material.shininess);
+        shaderUniform(sScene.shaderBlinnPhong, "uMaterial.shininess", material.shininess);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, material.map_ambient.id);
+        shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_ambient", 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, material.map_diffuse.id);
+        shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_diffuse", 1);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, material.map_specular.id);
+        shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_specular", 2);
+
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, material.map_normal.id);
+        shaderUniform(sScene.shaderBlinnPhong, "uMaterial.map_normal", 3);
 
         glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*) (material.indexOffset*sizeof(unsigned int)) );
     }
