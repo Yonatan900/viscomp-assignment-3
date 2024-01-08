@@ -7,6 +7,7 @@ struct Material
 
 in vec3 tNormal;
 in vec3 tFragPos;
+in vec2 tUV;
 
 out vec4 fragColor;
 
@@ -15,4 +16,5 @@ uniform Material uMaterial;
 void main(void)
 {
     fragColor = vec4(uMaterial.diffuse, 1.0);
+
 }

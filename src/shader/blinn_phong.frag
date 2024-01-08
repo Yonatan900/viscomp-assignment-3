@@ -31,9 +31,6 @@ struct Material
     sampler2D map_diffuse;
     sampler2D map_specular;
 
-//    vec3 ambient;
-//    vec3 diffuse;
-//    vec3 specular;
     float shininess;
 };
 uniform Material uMaterial;
